@@ -1,10 +1,15 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
 import "@radix-ui/themes/styles.css";
+import "./app.css";
+
+import Router from "./router/router";
 import { Theme } from "@radix-ui/themes";
 
-export default function App() {
-  return (
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
     <Theme>
-      <h1>Color Scheme Generator</h1>
+      <Router />
     </Theme>
-  );
-}
+  </React.StrictMode>
+);
