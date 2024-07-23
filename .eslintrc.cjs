@@ -8,28 +8,40 @@ module.exports = {
     project: ["./tsconfig.json", "./tsconfig.node.json", "./tsconfig.app.json"],
     tsconfigRootDir: __dirname,
   },
-  plugins: ["react-refresh"],
+  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  plugins: ["react-refresh", "import", "prettier"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:react/jsx-runtime",
-    "plugin:prettier/recommended",
+    "prettier",
   ],
-  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   rules: {
+    "prettier/prettier": "error",
     "react-refresh/only-export-components": [
       "warn",
-      { allowConstantExport: true },
+      {
+        allowConstantExport: true,
+      },
     ],
-    "prettier/prettier": [
+    "import/order": [
       "error",
       {
-        trailingComma: "es5",
-      },
-      {
-        usePrettierrc: false,
+        "newlines-between": "always",
+        pathGroups: [
+          {
+            pattern: "~/**",
+            group: "external",
+            position: "after",
+          },
+        ],
       },
     ],
   },
