@@ -1,7 +1,7 @@
 import chroma, { type Color } from "chroma-js";
 
 export const WCAG_CONTRAST = {
-  minimum: {
+  small: {
     AA: 4.5,
     AAA: 7,
   },
@@ -20,12 +20,15 @@ export const WCAG_FONT_SIZE = {
   },
 };
 
+type Compliance = {
+  AA: boolean;
+  AAA: boolean;
+};
+
 type ContrastRatioResult = {
   ratio: number;
-  isPassing: {
-    minimum: { AA: boolean; AAA: boolean };
-    large: { AA: boolean; AAA: boolean };
-  };
+  small: Compliance;
+  large: Compliance;
 };
 
 export function checkContrastRatio(color1: Color, color2: Color): ContrastRatioResult {
@@ -33,15 +36,13 @@ export function checkContrastRatio(color1: Color, color2: Color): ContrastRatioR
 
   return {
     ratio,
-    isPassing: {
-      minimum: {
-        AA: ratio >= WCAG_CONTRAST.minimum.AA,
-        AAA: ratio >= WCAG_CONTRAST.minimum.AAA,
-      },
-      large: {
-        AA: ratio >= WCAG_CONTRAST.large.AA,
-        AAA: ratio >= WCAG_CONTRAST.large.AAA,
-      },
+    small: {
+      AA: ratio >= WCAG_CONTRAST.small.AA,
+      AAA: ratio >= WCAG_CONTRAST.small.AAA,
+    },
+    large: {
+      AA: ratio >= WCAG_CONTRAST.large.AA,
+      AAA: ratio >= WCAG_CONTRAST.large.AAA,
     },
   };
 }
