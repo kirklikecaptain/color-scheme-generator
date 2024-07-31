@@ -6,6 +6,7 @@ export function Center(props: FlexProps) {
       direction="column"
       align="center"
       justify="center"
+      width="100%"
       {...props}
     />
   );

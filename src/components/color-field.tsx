@@ -1,38 +1,26 @@
 import { AccessibleIcon, Box, Flex, IconButton, TextField } from "@radix-ui/themes";
-import { Chrome, type ColorResult } from "@uiw/react-color";
+import { Chrome } from "@uiw/react-color";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, ChangeEvent } from "react";
+import { useState } from "react";
 import { MdOutlineErrorOutline, MdOutlineShuffle } from "react-icons/md";
 
-import { randomColor, isValidColor, colorToHex } from "~/utils/color";
+import { getRandomColor, isValidColor, colorToHex } from "~/utils/color";
 
 type ColorFieldProps = {
   id?: string;
   name: string;
   size?: "1" | "2" | "3";
   placeholder?: string;
-  initialValue?: string;
-  onChange?: (color: string) => void;
+  value: string;
+  onChange: (color: string) => void;
 };
 
 export function ColorField(props: ColorFieldProps) {
-  const [textInput, setTextInput] = useState(props.initialValue || "");
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  function updateColor(newColor: string) {
-    setTextInput(newColor);
-    props.onChange?.(newColor);
-  }
-
-  const generateNewColor = () => updateColor(randomColor());
-  const onColorPickerChange = (c: ColorResult) => updateColor(c.hex);
-  const onTextFieldChange = (e: ChangeEvent<HTMLInputElement>) => updateColor(e.target.value);
-  const onTextFieldFocus = () => setPickerOpen(true);
-  const onTextFieldBlur = () => setPickerOpen(false);
-
-  const textInputValid = isValidColor(textInput);
-  const colorOrFallback = colorToHex(textInputValid ? textInput : "white");
-  const showWarning = textInput.length > 2 && !textInputValid;
+  const textInputValid = isValidColor(props.value);
+  const showWarning = props.value.length > 2 && !textInputValid;
+  const colorOrFallback = colorToHex(textInputValid ? props.value : "white");
 
   return (
     <Box position="relative">
@@ -42,10 +30,10 @@ export function ColorField(props: ColorFieldProps) {
         name={props.name}
         size={props.size}
         placeholder={props.placeholder}
-        value={textInput}
-        onChange={onTextFieldChange}
-        onFocus={onTextFieldFocus}
-        onBlur={onTextFieldBlur}
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        onFocus={() => setPickerOpen(true)}
+        onBlur={() => setPickerOpen(false)}
       >
         <TextField.Slot side="left">
           {showWarning ? (
@@ -71,7 +59,7 @@ export function ColorField(props: ColorFieldProps) {
             size="1"
             aria-label="Random Color"
             type="button"
-            onClick={generateNewColor}
+            onClick={() => props.onChange(getRandomColor().hex())}
           >
             <MdOutlineShuffle />
           </IconButton>
@@ -88,7 +76,7 @@ export function ColorField(props: ColorFieldProps) {
             <Chrome
               style={{ borderRadius: "var(--radius-3)", overflow: "hidden", width: "100%" }}
               color={colorOrFallback}
-              onChange={onColorPickerChange}
+              onChange={(c) => props.onChange(c.hex)}
               showAlpha={false}
               showColorPreview={false}
               showEditableInput={false}

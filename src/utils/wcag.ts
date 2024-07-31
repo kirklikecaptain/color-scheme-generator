@@ -31,7 +31,7 @@ type ContrastRatioResult = {
   large: Compliance;
 };
 
-export function checkContrastRatio(color1: Color, color2: Color): ContrastRatioResult {
+export function checkContrastRatio(color1: string | Color, color2: string | Color): ContrastRatioResult {
   const ratio = chroma.contrast(color1, color2);
 
   return {

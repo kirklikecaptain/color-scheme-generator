@@ -1,1 +1,1 @@
-export { SchemeGenerator } from "./scheme-generator/scheme-generator";
+export { SchemeGenerator } from "./scheme-generator/scheme-generator.root";
