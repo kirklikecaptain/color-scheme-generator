@@ -6,7 +6,7 @@ export function useColorScheme() {
   const context = useContext(ColorSchemeContext);
 
   if (!context) {
-    throw new Error("useColorSchemeContext must be used within a ColorSchemeProvider");
+    throw new Error("`useColorScheme` hook must be used within a ColorSchemeProvider");
   }
 
   return context;

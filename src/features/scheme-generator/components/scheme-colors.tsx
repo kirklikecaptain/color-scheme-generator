@@ -2,11 +2,10 @@ import { Flex, Heading, Separator, Text } from "@radix-ui/themes";
 
 import { Stack } from "~/components";
 import { useColorScheme } from "~/hooks/use-color-scheme";
-import { ColorScale } from "~/hooks/use-color-scheme/state";
 
 type ColorSwatchRowProps = {
   title: string;
-  colors?: ColorScale;
+  colors?: { color: string; label: string }[];
 };
 
 function ColorSwatchRow({ title, colors }: ColorSwatchRowProps) {

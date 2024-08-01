@@ -1,7 +1,7 @@
-import chroma, { type Color } from "chroma-js";
+import chroma from "chroma-js";
 import { useState } from "react";
 
-import { getRandomColor } from "~/utils/color";
+import { generateColorScale, getRandomColor } from "~/utils/color";
 
 export enum AccentMode {
   COMPLIMENT = "Complement",
@@ -22,18 +22,10 @@ export type SchemeConfig = {
   scaleMode: ScaleMode;
 };
 
-export type ColorScaleOptions = {
-  name: string;
-  color: Color;
-  labels: string[];
-};
-
-export type ColorScale = { label: string; color: string }[];
-
 function getSchemeColorLabels(scaleMode: ScaleMode): string[] {
   switch (scaleMode) {
     case ScaleMode.SYSTEM:
-      return ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
+      return ["100", "200", "300", "400", "500", "600", "700", "800", "900"];
     case ScaleMode.SIMPLE:
       return ["Tint", "Light", "Medium", "Dark", "Shade"];
     case ScaleMode.MINIMAL:
@@ -43,47 +35,31 @@ function getSchemeColorLabels(scaleMode: ScaleMode): string[] {
   }
 }
 
-function generateColorScale(color: Color, scaleMode: ScaleMode): ColorScale {
-  const labels = getSchemeColorLabels(scaleMode);
-
-  const [h, s] = color.hsl();
-
-  const lightest = chroma.hsl(h, Math.min(s, 0.5), 0.95);
-  const middle = chroma.hsl(h, Math.min(s, 0.7), 0.5);
-  const darkest = chroma.hsl(h, Math.min(s, 0.5), 0.25);
-
-  const colors = chroma.scale([lightest, middle, darkest]).mode("oklab").colors(labels.length);
-
-  return colors.map((c, i) => ({
-    label: labels[i],
-    color: c,
-  }));
-}
-
 function generateColorScheme(config: SchemeConfig) {
   if (!chroma.valid(config.baseColor)) {
     return null;
   }
 
+  const labels = getSchemeColorLabels(config.scaleMode);
   const baseColor = chroma(config.baseColor);
   const adaptiveGray = chroma.mix("gray", baseColor.temperature() < 6000 ? "red" : "blue", 0.05);
 
-  const primary = generateColorScale(baseColor, config.scaleMode);
-  const neutral = generateColorScale(adaptiveGray, config.scaleMode);
+  const primary = generateColorScale(baseColor, labels);
+  const neutral = generateColorScale(adaptiveGray, labels);
 
   let tertiary, secondary;
 
   switch (config.accentMode) {
     case AccentMode.COMPLIMENT:
-      secondary = generateColorScale(baseColor.set("hsl.h", "+180"), config.scaleMode);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+180"), labels);
       break;
     case AccentMode.ANALOGS:
-      secondary = generateColorScale(baseColor.set("hsl.h", "-60"), config.scaleMode);
-      tertiary = generateColorScale(baseColor.set("hsl.h", "60"), config.scaleMode);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+45"), labels);
+      tertiary = generateColorScale(baseColor.set("hsl.h", "-45"), labels);
       break;
     case AccentMode.TRIADS:
-      secondary = generateColorScale(baseColor.set("hsl.h", "-120"), config.scaleMode);
-      tertiary = generateColorScale(baseColor.set("hsl.h", "+120"), config.scaleMode);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+120"), labels);
+      tertiary = generateColorScale(baseColor.set("hsl.h", "-120"), labels);
       break;
     case AccentMode.NONE:
       break;
@@ -106,7 +82,7 @@ export function useColorSchemeState() {
     scaleMode: ScaleMode.SYSTEM,
   });
 
-  function updateConfig(options: Partial<typeof config>) {
+  function updateConfig(options: Partial<SchemeConfig>) {
     setConfig((prevConfig) => ({
       ...prevConfig,
       ...options,

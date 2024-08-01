@@ -1,22 +1,24 @@
 import chroma, { type Color } from "chroma-js";
 
 export const isValidColor = (color: string) => chroma.valid(color);
-export const getValidColor = (color: string) => (isValidColor(color) ? chroma(color) : null);
+
+export const isWarmColor = (color: Color) => chroma(color).temperature() < 6000;
+
 export const getRandomColor = () => chroma.random();
-export const colorToHex = (color: string) => chroma(color).hex();
 
-export function getComplimentaryColor(color: Color) {
-  const h = color.get("hsl.h");
-  return color.set("hsl.h", h + 180);
-}
+export const colorStringToHex = (color: string) => chroma(color).hex();
 
-export function getAnalogColors(color: Color) {
-  const h = color.get("hsl.h");
-  return [h - 30, h + 30].map((h) => color.set("hsl.h", h));
-}
+export function generateColorScale(color: Color, steps: string[]) {
+  const [h, s] = color.hsl();
 
-export function generateColorScale(color: Color, steps: number) {
-  const range = [color.set("hsl.l", 0.95), color.set("hsl.l", 0.5), color.set("hsl.l", 0.2)];
+  const lightest = chroma.hsl(h, Math.min(s, 0.5), 0.95);
+  const middle = chroma.hsl(h, Math.min(s, 0.7), 0.5);
+  const darkest = chroma.hsl(h, Math.min(s, 0.5), 0.25);
 
-  return chroma.scale(range).mode("oklab").colors(steps);
+  const colors = chroma.scale([lightest, middle, darkest]).mode("oklab").colors(steps.length);
+
+  return colors.map((c, i) => ({
+    label: steps[i],
+    color: c,
+  }));
 }

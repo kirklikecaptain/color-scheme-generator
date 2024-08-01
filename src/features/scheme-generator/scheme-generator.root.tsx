@@ -11,7 +11,7 @@ export function SchemeGenerator() {
     <ColorSchemeProvider>
       <Section>
         <Container>
-          <Stack gap="4">
+          <Stack gap="6">
             <SchemeConfig />
             <SchemeColors />
           </Stack>
