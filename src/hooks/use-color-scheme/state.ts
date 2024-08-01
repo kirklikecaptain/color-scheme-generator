@@ -1,7 +1,7 @@
 import chroma from "chroma-js";
 import { useState } from "react";
 
-import { generateColorScale, getRandomColor } from "~/utils/color";
+import { generateColorScale, getRandomColor, isValidColor } from "~/utils/color";
 
 export enum AccentMode {
   COMPLIMENT = "Complement",
@@ -36,30 +36,30 @@ function getSchemeColorLabels(scaleMode: ScaleMode): string[] {
 }
 
 function generateColorScheme(config: SchemeConfig) {
-  if (!chroma.valid(config.baseColor)) {
+  if (!isValidColor(config.baseColor)) {
     return null;
   }
 
-  const labels = getSchemeColorLabels(config.scaleMode);
+  const steps = getSchemeColorLabels(config.scaleMode);
   const baseColor = chroma(config.baseColor);
   const adaptiveGray = chroma.mix("gray", baseColor.temperature() < 6000 ? "red" : "blue", 0.05);
 
-  const primary = generateColorScale(baseColor, labels);
-  const neutral = generateColorScale(adaptiveGray, labels);
+  const primary = generateColorScale(baseColor, steps);
+  const neutral = generateColorScale(adaptiveGray, steps);
 
   let tertiary, secondary;
 
   switch (config.accentMode) {
     case AccentMode.COMPLIMENT:
-      secondary = generateColorScale(baseColor.set("hsl.h", "+180"), labels);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+180"), steps);
       break;
     case AccentMode.ANALOGS:
-      secondary = generateColorScale(baseColor.set("hsl.h", "+45"), labels);
-      tertiary = generateColorScale(baseColor.set("hsl.h", "-45"), labels);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+45"), steps);
+      tertiary = generateColorScale(baseColor.set("hsl.h", "-45"), steps);
       break;
     case AccentMode.TRIADS:
-      secondary = generateColorScale(baseColor.set("hsl.h", "+120"), labels);
-      tertiary = generateColorScale(baseColor.set("hsl.h", "-120"), labels);
+      secondary = generateColorScale(baseColor.set("hsl.h", "+120"), steps);
+      tertiary = generateColorScale(baseColor.set("hsl.h", "-120"), steps);
       break;
     case AccentMode.NONE:
       break;
